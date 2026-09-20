@@ -27,7 +27,6 @@ var convertCmd = &cobra.Command{
 	Use:   "convert",
 	Short: "Convert ticks to bars",
 	Run: func(cmd *cobra.Command, args []string) {
-
 		config := models.Config{
 			InputDir:             utils.ToAbsPath(inputDir),
 			OutputDir:            utils.ToAbsPath(outputDir),
@@ -40,7 +39,6 @@ var convertCmd = &cobra.Command{
 			Force:                force,
 			WriteBatchSize:       writeBatchSize,
 		}
-
 		converter := converter.NewConverter(&config)
 
 		err := converter.Convert()
