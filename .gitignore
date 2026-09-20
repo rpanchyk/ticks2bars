@@ -3,8 +3,17 @@
 Thumbs.db
 Desktop.ini
 
+# IDE
+.idea/
+*.iml
+.vscode/
+
 # Data
 ticks/*.csv
 !ticks/.gitkeep
 bars/*.csv
 !bars/.gitkeep
+
+# Project
+builds/
+vendor/
