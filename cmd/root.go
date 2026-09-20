@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/models"
@@ -16,7 +17,7 @@ var rootCmd = &cobra.Command{
 	Short: "Ticks to Bars Converter",
 	Long: `Ticks to Bars Converter is a tool that converts ticks to bars.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Converting ticks to bars...")
+		cmd.Usage()
 	},
 }
 
@@ -34,61 +35,65 @@ func init() {
 func initConfig() {
 	globals.ConfigFile = "config.toml"
 
-	fmt.Println("Trying to get config file...")
+	fmt.Println("Getting config...")
 	exePath, err := os.Executable()
 	if err != nil {
 		fmt.Println("Cannot get executable path, error:", err)
 		os.Exit(1)
 	}
-	configDir := filepath.Dir(exePath)
-	fmt.Println("Executable directory:", configDir)
+	configFilePath := filepath.Join(filepath.Dir(exePath), globals.ConfigFile)
 
-	if isConfigNotFound(configDir) {
-		fmt.Println("Config not found, trying to get from current directory...")
+	if isConfigNotFound(configFilePath) {
+		fmt.Println("Config not found:", configFilePath)
 		currDir, err := os.Getwd()
 		if err != nil {
 			fmt.Println("Cannot get current directory, error:", err)
 			os.Exit(1)
 		}
-		configDir = currDir
-		fmt.Println("Current directory:", configDir)
+		configFilePath = filepath.Join(currDir, globals.ConfigFile)
 	}
 
-	if isConfigNotFound(configDir) {
-		fmt.Println("Config not found, trying to get from user home directory...")
+	if isConfigNotFound(configFilePath) {
+		fmt.Println("Config not found:", configFilePath)
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
 			fmt.Println("Cannot get user home directory, error:", err)
 			os.Exit(1)
 		}
-		configDir = userHomeDir
-		fmt.Println("User home directory:", configDir)
+		configFilePath = filepath.Join(userHomeDir, globals.ConfigFile)
 	}
 
-	if isConfigNotFound(configDir)  {
-		fmt.Println("Config not found, exiting...")
+	if isConfigNotFound(configFilePath) {
+		fmt.Println("Config not found:", configFilePath)
+		fmt.Println("Exiting...")
 		os.Exit(1)
 	}
+	fmt.Println("Config found:", configFilePath)
 
-	viper.AddConfigPath(configDir)
-	viper.SetConfigName("config")
-	viper.SetConfigType("toml")
+	configPath := filepath.Dir(configFilePath)
+	configFile := filepath.Base(configFilePath)
+	configExt := filepath.Ext(configFile)
+	configName := strings.TrimSuffix(configFile, configExt)
+
+	viper.AddConfigPath(configPath)
+	viper.SetConfigName(configName)
+	viper.SetConfigType(configExt[1:])
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println("Cannot read config, error:", err)
 		os.Exit(1)
 	}
 
 	globals.Config = getConfig()
-	fmt.Printf("Config: %+v\n", globals.Config)
+	fmt.Printf("Config: %+v\n\n", globals.Config)
 }
 
-func isConfigNotFound(exeDir string) bool {
-	_, err := os.Stat(filepath.Join(exeDir, globals.ConfigFile))
+func isConfigNotFound(filePath string) bool {
+	_, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return true
 		} else {
-			fmt.Println("Cannot get config file, error:", err)
+			fmt.Println("Cannot check file, error:", err)
 			os.Exit(1)
 		}
 	}
