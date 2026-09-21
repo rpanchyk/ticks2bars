@@ -63,12 +63,14 @@ func (c *DefaultConverter) Convert() error {
 		}
 
 		// check if bars file already exists for timeframe
-		if !c.config.Force {
-			for _, timeframe := range timeframes {
-				barsFile := filepath.Join(c.config.OutputDir, symbol+"_"+timeframe+".csv")
-				if utils.FileExists(barsFile) {
+		for _, timeframe := range timeframes {
+			barsFile := filepath.Join(c.config.OutputDir, symbol+"_"+timeframe+".csv")
+			if utils.FileExists(barsFile) {
+				if !c.config.Force {
 					fmt.Println(symbol, timeframe, "bars file already exists at", barsFile, "(use --force to overwrite)")
 					os.Exit(1)
+				} else {
+					fmt.Println(symbol, timeframe, "bars file already exists at", barsFile, "(will be overwritten)")
 				}
 			}
 		}

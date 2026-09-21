@@ -8,7 +8,7 @@ type Config struct {
 	AvailableTimeframes string `mapstructure:"available_timeframes"`
 	Timeframes          string `mapstructure:"timeframes"`
 
-	IncludeHeader        bool   `mapstructure:"include_header"`
+	IncludeBarsHeader    bool   `mapstructure:"include_bars_header"`
 	TicksTimestampLayout string `mapstructure:"ticks_timestamp_layout"`
 	BarsTimestampLayout  string `mapstructure:"bars_timestamp_layout"`
 

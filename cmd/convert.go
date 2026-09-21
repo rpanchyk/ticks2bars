@@ -16,7 +16,7 @@ var (
 	outputDir            string
 	symbols              string
 	timeframes           string
-	includeHeader        bool
+	includeBarsHeader    bool
 	ticksTimestampLayout string
 	barsTimestampLayout  string
 	force                bool
@@ -33,7 +33,7 @@ var convertCmd = &cobra.Command{
 			Symbols:              utils.FirstNonEmptyString(symbols, globals.Config.Symbols),
 			AvailableTimeframes:  globals.Config.AvailableTimeframes,
 			Timeframes:           utils.FirstNonEmptyString(timeframes, globals.Config.Timeframes),
-			IncludeHeader:        utils.FirstNonFalseBool(includeHeader, globals.Config.IncludeHeader),
+			IncludeBarsHeader:    utils.FirstNonFalseBool(includeBarsHeader, globals.Config.IncludeBarsHeader),
 			TicksTimestampLayout: utils.FirstNonEmptyString(ticksTimestampLayout, globals.Config.TicksTimestampLayout),
 			BarsTimestampLayout:  utils.FirstNonEmptyString(barsTimestampLayout, globals.Config.BarsTimestampLayout),
 			Force:                utils.FirstNonFalseBool(force, globals.Config.Force),
@@ -54,7 +54,7 @@ func init() {
 	convertCmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for bars")
 	convertCmd.Flags().StringVar(&symbols, "symbols", "", "Symbols to convert")
 	convertCmd.Flags().StringVar(&timeframes, "timeframes", "", "Timeframes to convert")
-	convertCmd.Flags().BoolVar(&includeHeader, "include-header", false, "Include header in output")
+	convertCmd.Flags().BoolVar(&includeBarsHeader, "include-bars-header", false, "Include header in bars file")
 	convertCmd.Flags().StringVar(&ticksTimestampLayout, "ticks-timestamp-layout", "", "Ticks timestamp layout")
 	convertCmd.Flags().StringVar(&barsTimestampLayout, "bars-timestamp-layout", "", "Bars timestamp layout")
 	convertCmd.Flags().BoolVar(&force, "force", false, "Overwrite existing bars")

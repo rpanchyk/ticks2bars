@@ -32,7 +32,7 @@ output_dir = "bars" # директорія для збереження барі�
 symbols = "EURUSD,GBPUSD,XAUUSD,NAS100" # символи, --symbols="EURUSD,GBPUSD,XAUUSD,NAS100"
 available_timeframes = "1m,2m,3m,5m,10m,15m,30m,1h,2h,4h,6h,8h,12h,D,W,M,Y" # доступні таймфрейми, статична конфігурація
 timeframes = "1m,15m,1h" # таймфрейми, --timeframes="1m,15m,1h"
-include_header = false # включати заголовок в файли барів, --include-header=false
+include_bars_header = false # включати заголовок в файли барів, --include-bars-header=false
 ticks_timestamp_layout = "2006.01.02 15:04:05.000" # формат timestamp у файлах тіків, --ticks-timestamp-layout="2006.01.02 15:04:05.000"
 bars_timestamp_layout = "2006-01-02 15:04:05" # формат timestamp у файлах барів, --bars-timestamp-layout="2006-01-02 15:04:05"
 
