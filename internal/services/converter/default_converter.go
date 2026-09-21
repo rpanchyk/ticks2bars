@@ -8,23 +8,26 @@ import (
 	"strings"
 
 	"github.com/rpanchyk/ticks2bars/internal/models"
+	"github.com/rpanchyk/ticks2bars/internal/services/pipeline"
 	"github.com/rpanchyk/ticks2bars/internal/utils"
 )
 
 type DefaultConverter struct {
-	config *models.Config
+	config   *models.Config
+	pipeline pipeline.Pipeline
 }
 
-func NewConverter(config *models.Config) *DefaultConverter {
+func NewConverter(config *models.Config, pipeline pipeline.Pipeline) *DefaultConverter {
 	return &DefaultConverter{
-		config: config,
+		config:   config,
+		pipeline: pipeline,
 	}
 }
 
 func (c *DefaultConverter) Convert() error {
 	fmt.Println("Converter started")
 
-	fmt.Printf("Config: %+v\n", c.config)
+	fmt.Printf("Params: %+v\n", c.config)
 
 	// symbols
 	var symbols []string
@@ -41,19 +44,21 @@ func (c *DefaultConverter) Convert() error {
 	fmt.Printf("Available timeframes: %+v\n", availableTimeframes)
 
 	// timeframes
-	var timeframes []string
-	for _, s := range strings.Split(c.config.Timeframes, ",") {
-		trimmed := strings.TrimSpace(s)
+	var timeframes []models.Timeframe
+	for _, timeframe := range strings.Split(c.config.Timeframes, ",") {
+		trimmed := strings.TrimSpace(timeframe)
 		if slices.Contains(availableTimeframes, trimmed) {
-			timeframes = append(timeframes, strings.TrimSpace(s))
+			timeframes = append(timeframes, models.Timeframe(trimmed))
 		} else {
 			fmt.Println("Timeframe is not available:", trimmed)
 			os.Exit(1)
 		}
 	}
+	slices.SortFunc(timeframes, models.CompareTimeframes)
 	fmt.Printf("Timeframes: %+v\n", timeframes)
 
-	convertables := make(map[string]models.Convertable)
+	// prepare
+	convertables := []models.Convertable{}
 	for _, symbol := range symbols {
 		// check if ticks file exists
 		ticksFile := filepath.Join(c.config.InputDir, symbol+"_ticks.csv")
@@ -64,7 +69,7 @@ func (c *DefaultConverter) Convert() error {
 
 		// check if bars file already exists for timeframe
 		for _, timeframe := range timeframes {
-			barsFile := filepath.Join(c.config.OutputDir, symbol+"_"+timeframe+".csv")
+			barsFile := filepath.Join(c.config.OutputDir, symbol+"_"+timeframe.String()+".csv")
 			if utils.FileExists(barsFile) {
 				if !c.config.Force {
 					fmt.Println(symbol, timeframe, "bars file already exists at", barsFile, "(use --force to overwrite)")
@@ -75,13 +80,21 @@ func (c *DefaultConverter) Convert() error {
 			}
 		}
 
-		convertables[symbol] = models.Convertable{
+		// add
+		convertables = append(convertables, models.Convertable{
 			TicksFile:  ticksFile,
+			Symbol:     symbol,
 			Timeframes: timeframes,
-		}
+		})
 	}
-	for k, v := range convertables {
-		fmt.Printf("Convertable %s: %+v\n", k, v)
+
+	// run
+	for _, convertable := range convertables {
+		err := c.pipeline.Run(convertable)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 
 	fmt.Println("Converter finished")

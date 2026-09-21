@@ -7,6 +7,9 @@ import (
 	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/models"
 	"github.com/rpanchyk/ticks2bars/internal/services/converter"
+	"github.com/rpanchyk/ticks2bars/internal/services/pipeline"
+	"github.com/rpanchyk/ticks2bars/internal/services/reader"
+	"github.com/rpanchyk/ticks2bars/internal/services/writer"
 	"github.com/rpanchyk/ticks2bars/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +30,7 @@ var convertCmd = &cobra.Command{
 	Use:   "convert",
 	Short: "Convert ticks to bars",
 	Run: func(cmd *cobra.Command, args []string) {
-		config := models.Config{
+		config := &models.Config{
 			InputDir:             utils.ToAbsPath(utils.FirstNonEmptyString(inputDir, globals.Config.InputDir)),
 			OutputDir:            utils.ToAbsPath(utils.FirstNonEmptyString(outputDir, globals.Config.OutputDir)),
 			Symbols:              utils.FirstNonEmptyString(symbols, globals.Config.Symbols),
@@ -39,7 +42,10 @@ var convertCmd = &cobra.Command{
 			Force:                utils.FirstNonFalseBool(force, globals.Config.Force),
 			WriteBatchSize:       utils.FirstNonZeroInt(writeBatchSize, globals.Config.WriteBatchSize),
 		}
-		converter := converter.NewConverter(&config)
+		reader := reader.NewReader()
+		writer := writer.NewWriter()
+		pipeline := pipeline.NewPipeline(reader, writer)
+		converter := converter.NewConverter(config, pipeline)
 
 		err := converter.Convert()
 		if err != nil {
