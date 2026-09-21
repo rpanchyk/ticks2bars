@@ -28,16 +28,16 @@ var convertCmd = &cobra.Command{
 	Short: "Convert ticks to bars",
 	Run: func(cmd *cobra.Command, args []string) {
 		config := models.Config{
-			InputDir:             utils.ToAbsPath(inputDir),
-			OutputDir:            utils.ToAbsPath(outputDir),
-			Symbols:              symbols,
+			InputDir:             utils.ToAbsPath(utils.FirstNonEmptyString(inputDir, globals.Config.InputDir)),
+			OutputDir:            utils.ToAbsPath(utils.FirstNonEmptyString(outputDir, globals.Config.OutputDir)),
+			Symbols:              utils.FirstNonEmptyString(symbols, globals.Config.Symbols),
 			AvailableTimeframes:  globals.Config.AvailableTimeframes,
-			Timeframes:           timeframes,
-			IncludeHeader:        includeHeader,
-			TicksTimestampLayout: ticksTimestampLayout,
-			BarsTimestampLayout:  barsTimestampLayout,
-			Force:                force,
-			WriteBatchSize:       writeBatchSize,
+			Timeframes:           utils.FirstNonEmptyString(timeframes, globals.Config.Timeframes),
+			IncludeHeader:        utils.FirstNonFalseBool(includeHeader, globals.Config.IncludeHeader),
+			TicksTimestampLayout: utils.FirstNonEmptyString(ticksTimestampLayout, globals.Config.TicksTimestampLayout),
+			BarsTimestampLayout:  utils.FirstNonEmptyString(barsTimestampLayout, globals.Config.BarsTimestampLayout),
+			Force:                utils.FirstNonFalseBool(force, globals.Config.Force),
+			WriteBatchSize:       utils.FirstNonZeroInt(writeBatchSize, globals.Config.WriteBatchSize),
 		}
 		converter := converter.NewConverter(&config)
 
@@ -50,15 +50,15 @@ var convertCmd = &cobra.Command{
 }
 
 func init() {
-	convertCmd.Flags().StringVar(&inputDir, "input-dir", globals.Config.InputDir, "Input directory for ticks")
-	convertCmd.Flags().StringVar(&outputDir, "output-dir", globals.Config.OutputDir, "Output directory for bars")
-	convertCmd.Flags().StringVar(&symbols, "symbols", globals.Config.Symbols, "Symbols to convert")
-	convertCmd.Flags().StringVar(&timeframes, "timeframes", globals.Config.Timeframes, "Timeframes to convert")
-	convertCmd.Flags().BoolVar(&includeHeader, "include-header", globals.Config.IncludeHeader, "Include header in output")
-	convertCmd.Flags().StringVar(&ticksTimestampLayout, "ticks-timestamp-layout", globals.Config.TicksTimestampLayout, "Ticks timestamp layout")
-	convertCmd.Flags().StringVar(&barsTimestampLayout, "bars-timestamp-layout", globals.Config.BarsTimestampLayout, "Bars timestamp layout")
-	convertCmd.Flags().BoolVar(&force, "force", globals.Config.Force, "Overwrite existing bars")
-	convertCmd.Flags().IntVar(&writeBatchSize, "write-batch-size", globals.Config.WriteBatchSize, "Write batch size")
+	convertCmd.Flags().StringVar(&inputDir, "input-dir", "", "Input directory for ticks")
+	convertCmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for bars")
+	convertCmd.Flags().StringVar(&symbols, "symbols", "", "Symbols to convert")
+	convertCmd.Flags().StringVar(&timeframes, "timeframes", "", "Timeframes to convert")
+	convertCmd.Flags().BoolVar(&includeHeader, "include-header", false, "Include header in output")
+	convertCmd.Flags().StringVar(&ticksTimestampLayout, "ticks-timestamp-layout", "", "Ticks timestamp layout")
+	convertCmd.Flags().StringVar(&barsTimestampLayout, "bars-timestamp-layout", "", "Bars timestamp layout")
+	convertCmd.Flags().BoolVar(&force, "force", false, "Overwrite existing bars")
+	convertCmd.Flags().IntVar(&writeBatchSize, "write-batch-size", 0, "Write batch size")
 
 	rootCmd.AddCommand(convertCmd)
 }

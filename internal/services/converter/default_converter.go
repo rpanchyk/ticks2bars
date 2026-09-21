@@ -19,6 +19,8 @@ func NewConverter(config *models.Config) *DefaultConverter {
 func (c *DefaultConverter) Convert() error {
 	fmt.Println("Default converter started")
 
+	fmt.Printf("Config: %+v\n", c.config)
+
 	//...
 
 	fmt.Println("Default converter finished")
