@@ -2,8 +2,8 @@ input_dir = "ticks" # input directory for ticks, --input-dir="ticks"
 output_dir = "bars" # output directory for bars, --output-dir="bars"
 
 symbols = "EURUSD,GBPUSD,XAUUSD,NAS100" # symbols, --symbols="EURUSD,GBPUSD,XAUUSD,NAS100"
-available_timeframes = "1m,2m,3m,5m,10m,15m,30m,1h,2h,4h,6h,8h,12h,D,W,M,Y" # available timeframes
-timeframes = "1m,15m,1h" # timeframes, --timeframes="1m,15m,1h"
+available_timeframes = "1m,2m,3m,5m,10m,15m,30m,1h,2h,4h,6h,8h,12h,D,W,M,Y" # available timeframes (case-sensitive)
+timeframes = "1m,15m,1h" # timeframes (case-sensitive), --timeframes="1m,15m,1h"
 include_header = false # include header in bar files, --include-header=false
 ticks_timestamp_layout = "2006.01.02 15:04:05.000" # timestamp layout for tick files, --ticks-timestamp-layout="2006.01.02 15:04:05.000"
 bars_timestamp_layout = "2006-01-02 15:04:05" # timestamp layout for bar files, --bars-timestamp-layout="2006-01-02 15:04:05"
