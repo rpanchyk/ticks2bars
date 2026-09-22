@@ -27,6 +27,14 @@ func (h *DefaultHandler) Handle(tick models.Tick) error {
 	// fmt.Println(h.bar.Timeframe, "time=", tick.Timestamp)
 	interval := time.Duration(h.bar.Timeframe.Minutes()) * time.Minute
 	barTime := tick.Timestamp.Truncate(interval)
+
+	// adjust monthly and yearly bars
+	switch h.bar.Timeframe {
+	case models.TF_M:
+		barTime = time.Date(tick.Timestamp.Year(), tick.Timestamp.Month(), 1, 0, 0, 0, 0, tick.Timestamp.Location())
+	case models.TF_Y:
+		barTime = time.Date(tick.Timestamp.Year(), 1, 1, 0, 0, 0, 0, tick.Timestamp.Location())
+	}
 	// fmt.Println(h.bar.Timeframe, "barTime=", barTime)
 
 	midPrice := (tick.Bid.Add(tick.Ask)).Div(decimal.NewFromInt(2))

@@ -66,7 +66,7 @@ func (r *DefaultReader) Read(filePath string, ctx context.Context, ticksChan cha
 			return ctx.Err()
 		}
 
-		if lineNumber >= 2000 { // TODO: remove
+		if lineNumber >= 20000000 { // TODO: remove
 			break
 		}
 		lineNumber++

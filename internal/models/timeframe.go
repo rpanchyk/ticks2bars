@@ -7,61 +7,61 @@ import (
 type Timeframe string
 
 const (
-	m1  Timeframe = "1m"
-	m2  Timeframe = "2m"
-	m3  Timeframe = "3m"
-	m5  Timeframe = "5m"
-	m10 Timeframe = "10m"
-	m15 Timeframe = "15m"
-	m30 Timeframe = "30m"
-	h1  Timeframe = "1h"
-	h2  Timeframe = "2h"
-	h4  Timeframe = "4h"
-	h6  Timeframe = "6h"
-	h8  Timeframe = "8h"
-	h12 Timeframe = "12h"
-	D   Timeframe = "D"
-	W   Timeframe = "W"
-	M   Timeframe = "M"
-	Y   Timeframe = "Y"
+	TF_m1  Timeframe = "1m"
+	TF_m2  Timeframe = "2m"
+	TF_m3  Timeframe = "3m"
+	TF_m5  Timeframe = "5m"
+	TF_m10 Timeframe = "10m"
+	TF_m15 Timeframe = "15m"
+	TF_m30 Timeframe = "30m"
+	TF_h1  Timeframe = "1h"
+	TF_h2  Timeframe = "2h"
+	TF_h4  Timeframe = "4h"
+	TF_h6  Timeframe = "6h"
+	TF_h8  Timeframe = "8h"
+	TF_h12 Timeframe = "12h"
+	TF_D   Timeframe = "D"
+	TF_W   Timeframe = "W"
+	TF_M   Timeframe = "M"
+	TF_Y   Timeframe = "Y"
 )
 
 func (t Timeframe) Minutes() int {
 	switch t {
-	case m1:
+	case TF_m1:
 		return 1
-	case m2:
+	case TF_m2:
 		return 2
-	case m3:
+	case TF_m3:
 		return 3
-	case m5:
+	case TF_m5:
 		return 5
-	case m10:
+	case TF_m10:
 		return 10
-	case m15:
+	case TF_m15:
 		return 15
-	case m30:
+	case TF_m30:
 		return 30
-	case h1:
+	case TF_h1:
 		return 60
-	case h2:
+	case TF_h2:
 		return 120
-	case h4:
+	case TF_h4:
 		return 240
-	case h6:
+	case TF_h6:
 		return 360
-	case h8:
+	case TF_h8:
 		return 480
-	case h12:
+	case TF_h12:
 		return 720
-	case D:
+	case TF_D:
 		return 1440
-	case W:
+	case TF_W:
 		return 10080
-	case M:
-		return 43200
-	case Y:
-		return 525600
+	case TF_M:
+		return 43200 // approximate
+	case TF_Y:
+		return 525600 // approximate
 	default:
 		log.Fatal("Unable to get minutes for timeframe:", t)
 		return -1
