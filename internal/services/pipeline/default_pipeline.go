@@ -26,5 +26,10 @@ func NewPipeline(reader reader.Reader, writer writer.Writer) *DefaultPipeline {
 func (p *DefaultPipeline) Run(convertable models.Convertable) error {
 	fmt.Printf("Convertable: %+v\n", convertable)
 
+	err := p.reader.Read(convertable.TicksFile)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

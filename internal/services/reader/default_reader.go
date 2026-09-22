@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/models"
+	"github.com/shopspring/decimal"
 )
 
 type DefaultReader struct {
@@ -24,7 +26,7 @@ func (r *DefaultReader) Read(filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		fmt.Println("Cannot open file:", err)
-		os.Exit(1)
+		return err
 	}
 	defer file.Close()
 
@@ -37,30 +39,30 @@ func (r *DefaultReader) Read(filePath string) error {
 				break
 			}
 			fmt.Printf("Error reading line %d: %v\n", lineNumber, err)
-			break
+			return err
 		}
 
-		lineNumber++
-		// fmt.Printf("Line %d: %v\n", lineNumber, record)
+		timestamp, err := time.Parse(r.config.TicksTimestampLayout, record[0])
+		if err != nil {
+			fmt.Printf("Error parsing timestamp: %v\n", err)
+			return err
+		}
+		bid, err := decimal.NewFromString(record[1])
+		if err != nil {
+			return err
+		}
+		ask, err := decimal.NewFromString(record[2])
+		if err != nil {
+			return err
+		}
 
-		// dateStr := "25.12.2026 18:30:00"
-
-		// // Створюємо кастомний layout, використовуючи опорну дату Go
-		// // Опорний шаблон для "ДД.ММ.РРРР ГГ:ХХ:СС" виглядатиме так:
-		// layout := "02.01.2006 15:04:05"
-
-		// parsedTime, err := time.Parse(layout, dateStr)
-		// if err != nil {
-		// 	fmt.Printf("Помилка парсингу дати: %v\n", err)
-		// 	return
-		// }
-
-		tick := models.Tick{Timestamp: record[0], Bid: record[1], Ask: record[2]}
-		fmt.Printf("Tick \t\t%d: %v\n", lineNumber, tick)
+		tick := models.Tick{Timestamp: timestamp, Bid: bid, Ask: ask}
+		fmt.Printf("Tick %d: %v\n", lineNumber, tick)
 
 		if lineNumber > 5 {
 			break
 		}
+		lineNumber++
 	}
 
 	return nil
