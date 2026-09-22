@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/models"
 	"github.com/rpanchyk/ticks2bars/internal/services/pipeline"
 	"github.com/rpanchyk/ticks2bars/internal/utils"
@@ -17,17 +18,15 @@ type DefaultConverter struct {
 	pipeline pipeline.Pipeline
 }
 
-func NewConverter(config *models.Config, pipeline pipeline.Pipeline) *DefaultConverter {
+func NewConverter(pipeline pipeline.Pipeline) *DefaultConverter {
 	return &DefaultConverter{
-		config:   config,
+		config:   &globals.Config,
 		pipeline: pipeline,
 	}
 }
 
 func (c *DefaultConverter) Convert() error {
 	fmt.Println("Converter started")
-
-	fmt.Printf("Params: %+v\n", c.config)
 
 	// symbols
 	var symbols []string

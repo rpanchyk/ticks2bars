@@ -6,14 +6,18 @@ import (
 	"io"
 	"os"
 
+	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/models"
 )
 
 type DefaultReader struct {
+	config *models.Config
 }
 
 func NewReader() *DefaultReader {
-	return &DefaultReader{}
+	return &DefaultReader{
+		config: &globals.Config,
+	}
 }
 
 func (r *DefaultReader) Read(filePath string) error {
