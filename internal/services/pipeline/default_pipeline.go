@@ -72,9 +72,15 @@ func (p *DefaultPipeline) handle(symbol string, timeframes []models.Timeframe, c
 		select {
 		case tick, ok := <-ticksChan:
 			if !ok {
+				for _, handler := range handlers {
+					err := handler.Flush()
+					if err != nil {
+						return err
+					}
+				}
 				return nil
 			}
-			fmt.Println("handling tick", tick)
+			// fmt.Println("handling tick", tick)
 
 			for _, handler := range handlers {
 				err := handler.Handle(tick)

@@ -1,11 +1,17 @@
 package models
 
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
+
 type Bar struct {
 	Symbol    string
 	Timeframe Timeframe
-	Timestamp string
-	Open      string
-	High      string
-	Low       string
-	Close     string
+	Timestamp time.Time
+	Open      decimal.Decimal
+	High      decimal.Decimal
+	Low       decimal.Decimal
+	Close     decimal.Decimal
 }

@@ -2,37 +2,68 @@ package handler
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/rpanchyk/ticks2bars/internal/models"
+	"github.com/shopspring/decimal"
 )
 
 type DefaultHandler struct {
-	symbol    string
-	timeframe models.Timeframe
-	barsChan  chan<- models.Bar
+	barsChan chan<- models.Bar
+	bar      models.Bar
 }
 
 func NewHandler(symbol string, timeframe models.Timeframe, barsChan chan<- models.Bar) *DefaultHandler {
 	return &DefaultHandler{
-		symbol:    symbol,
-		timeframe: timeframe,
-		barsChan:  barsChan,
+		barsChan: barsChan,
+		bar: models.Bar{
+			Symbol:    symbol,
+			Timeframe: timeframe,
+		},
 	}
 }
 
 func (h *DefaultHandler) Handle(tick models.Tick) error {
-	bar := models.Bar{
-		Symbol:    h.symbol,
-		Timeframe: h.timeframe,
-		Timestamp: "2022-01-01 00:00:00",
-		Open:      tick.Bid.String(),
-		High:      tick.Bid.String(),
-		Low:       tick.Ask.String(),
-		Close:     tick.Ask.String(),
+	// fmt.Println(h.bar.Timeframe, "time=", tick.Timestamp)
+	interval := time.Duration(h.bar.Timeframe.Minutes()) * time.Minute
+	barTime := tick.Timestamp.Truncate(interval)
+	// fmt.Println(h.bar.Timeframe, "barTime=", barTime)
+
+	midPrice := (tick.Bid.Add(tick.Ask)).Div(decimal.NewFromInt(2))
+
+	if isBarEmpty(h.bar) || isBarComplete(h.bar, barTime) {
+		err := h.Flush()
+		if err != nil {
+			return err
+		}
+
+		// new bar
+		h.bar.Timestamp = barTime
+		h.bar.Open = midPrice
+		h.bar.High = midPrice
+		h.bar.Low = midPrice
+		h.bar.Close = midPrice
+	} else {
+		// update bar
+		h.bar.High = decimal.Max(h.bar.High, midPrice)
+		h.bar.Low = decimal.Min(h.bar.Low, midPrice)
+		h.bar.Close = midPrice
 	}
-
-	fmt.Println("sending bar", bar)
-	h.barsChan <- bar
-
 	return nil
+}
+
+func (h *DefaultHandler) Flush() error {
+	if !isBarEmpty(h.bar) {
+		fmt.Println("sending bar", h.bar)
+		h.barsChan <- h.bar
+	}
+	return nil
+}
+
+func isBarEmpty(bar models.Bar) bool {
+	return bar.Timestamp.Equal(time.Time{})
+}
+
+func isBarComplete(bar models.Bar, barTime time.Time) bool {
+	return bar.Timestamp.Before(barTime)
 }

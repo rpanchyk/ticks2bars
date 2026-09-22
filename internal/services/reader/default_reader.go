@@ -58,7 +58,7 @@ func (r *DefaultReader) Read(filePath string, ctx context.Context, ticksChan cha
 		}
 
 		tick := models.Tick{Timestamp: timestamp, Bid: bid, Ask: ask}
-		fmt.Printf("Tick %d: %v\n", lineNumber, tick)
+		// fmt.Printf("Tick %d: %v\n", lineNumber, tick)
 		select {
 		case ticksChan <- tick:
 			// noop
@@ -66,11 +66,10 @@ func (r *DefaultReader) Read(filePath string, ctx context.Context, ticksChan cha
 			return ctx.Err()
 		}
 
-		if lineNumber >= 5 { // TODO: remove
+		if lineNumber >= 2000 { // TODO: remove
 			break
 		}
 		lineNumber++
 	}
-
 	return nil
 }
