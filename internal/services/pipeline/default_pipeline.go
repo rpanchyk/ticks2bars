@@ -6,6 +6,7 @@ import (
 
 	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/models"
+	"github.com/rpanchyk/ticks2bars/internal/services/handler"
 	"github.com/rpanchyk/ticks2bars/internal/services/reader"
 	"github.com/rpanchyk/ticks2bars/internal/services/writer"
 	"golang.org/x/sync/errgroup"
@@ -34,28 +35,39 @@ func (p *DefaultPipeline) Run(convertable models.Convertable) error {
 	// read
 	g, ctx := errgroup.WithContext(context.Background())
 	g.Go(func() error {
-		defer close(ticksChan)
+		defer func() {
+			close(ticksChan)
+			// fmt.Println("ticks channel closed")
+		}()
 		return p.reader.Read(convertable.TicksFile, ctx, ticksChan)
 	})
 
-	// handle
-	p.handle(ctx, ticksChan, barsChan)
-
 	// write
 	g.Go(func() error {
-		defer close(barsChan)
 		return p.writer.Write(ctx, barsChan)
 	})
 
+	// process
+	p.handle(convertable.Symbol, convertable.Timeframes, ctx, ticksChan, barsChan)
+
+	// wait all go routines to finish
 	if err := g.Wait(); err != nil {
-		fmt.Printf("Error: %v\n", err)
-	} else {
-		fmt.Println("Done")
+		return err
 	}
 	return nil
 }
 
-func (p *DefaultPipeline) handle(ctx context.Context, ticksChan <-chan models.Tick, barsChan chan<- models.Bar) error {
+func (p *DefaultPipeline) handle(symbol string, timeframes []models.Timeframe, ctx context.Context, ticksChan <-chan models.Tick, barsChan chan<- models.Bar) error {
+	defer func() {
+		close(barsChan)
+		// fmt.Println("bars channel closed")
+	}()
+
+	handlers := make([]handler.Handler, 0, len(timeframes))
+	for _, timeframe := range timeframes {
+		handlers = append(handlers, handler.NewHandler(symbol, timeframe, barsChan))
+	}
+
 	for {
 		select {
 		case tick, ok := <-ticksChan:
@@ -64,17 +76,12 @@ func (p *DefaultPipeline) handle(ctx context.Context, ticksChan <-chan models.Ti
 			}
 			fmt.Println("handling tick", tick)
 
-			bar := models.Bar{
-				Symbol:    "BTCUSDT",
-				Timeframe: models.Timeframe("1m"),
-				Timestamp: tick.Timestamp.String(),
-				Open:      tick.Bid.String(),
-				High:      tick.Bid.String(),
-				Low:       tick.Ask.String(),
-				Close:     tick.Ask.String(),
+			for _, handler := range handlers {
+				err := handler.Handle(tick)
+				if err != nil {
+					return err
+				}
 			}
-			barsChan <- bar
-			fmt.Println("sending bar", bar)
 
 		case <-ctx.Done():
 			return ctx.Err()

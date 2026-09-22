@@ -48,7 +48,7 @@ func (c *DefaultConverter) Convert() error {
 		if slices.Contains(availableTimeframes, trimmed) {
 			timeframes = append(timeframes, models.Timeframe(trimmed))
 		} else {
-			return fmt.Errorf("Timeframe is not available:", trimmed)
+			return fmt.Errorf("Timeframe is not available: %s", trimmed)
 		}
 	}
 	slices.SortFunc(timeframes, models.CompareTimeframes)
@@ -60,7 +60,7 @@ func (c *DefaultConverter) Convert() error {
 		// check if ticks file exists
 		ticksFile := filepath.Join(c.config.InputDir, symbol+"_ticks.csv")
 		if utils.FileDoesNotExist(ticksFile) {
-			return fmt.Errorf("Ticks file not found:", ticksFile)
+			return fmt.Errorf("Ticks file not found: %s", ticksFile)
 		}
 
 		// check if bars file already exists for timeframe
