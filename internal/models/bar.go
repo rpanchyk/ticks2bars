@@ -1,6 +1,8 @@
 package models
 
 type Bar struct {
+	Symbol    string
+	Timeframe Timeframe
 	Timestamp string
 	Open      string
 	High      string

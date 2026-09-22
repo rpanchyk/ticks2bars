@@ -2,7 +2,6 @@ package converter
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -49,8 +48,7 @@ func (c *DefaultConverter) Convert() error {
 		if slices.Contains(availableTimeframes, trimmed) {
 			timeframes = append(timeframes, models.Timeframe(trimmed))
 		} else {
-			fmt.Println("Timeframe is not available:", trimmed)
-			os.Exit(1)
+			return fmt.Errorf("Timeframe is not available:", trimmed)
 		}
 	}
 	slices.SortFunc(timeframes, models.CompareTimeframes)
@@ -62,8 +60,7 @@ func (c *DefaultConverter) Convert() error {
 		// check if ticks file exists
 		ticksFile := filepath.Join(c.config.InputDir, symbol+"_ticks.csv")
 		if utils.FileDoesNotExist(ticksFile) {
-			fmt.Println("Ticks file not found:", ticksFile)
-			os.Exit(1)
+			return fmt.Errorf("Ticks file not found:", ticksFile)
 		}
 
 		// check if bars file already exists for timeframe
@@ -71,8 +68,7 @@ func (c *DefaultConverter) Convert() error {
 			barsFile := filepath.Join(c.config.OutputDir, symbol+"_"+timeframe.String()+".csv")
 			if utils.FileExists(barsFile) {
 				if !c.config.Force {
-					fmt.Println(symbol, timeframe, "bars file already exists at", barsFile, "(use --force to overwrite)")
-					os.Exit(1)
+					return fmt.Errorf(symbol, timeframe, "bars file already exists at", barsFile, "(use --force to overwrite)")
 				} else {
 					fmt.Println(symbol, timeframe, "bars file already exists at", barsFile, "(will be overwritten)")
 				}
@@ -91,8 +87,7 @@ func (c *DefaultConverter) Convert() error {
 	for _, convertable := range convertables {
 		err := c.pipeline.Run(convertable)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return err
 		}
 	}
 

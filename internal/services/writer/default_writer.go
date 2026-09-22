@@ -1,6 +1,9 @@
 package writer
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/models"
 )
@@ -15,6 +18,16 @@ func NewWriter() *DefaultWriter {
 	}
 }
 
-func (w *DefaultWriter) Write(bars []models.Bar) error {
-	return w.Write(bars)
+func (w *DefaultWriter) Write(ctx context.Context, barsChan <-chan models.Bar) error {
+	for {
+		select {
+		case bar, ok := <-barsChan:
+			if !ok {
+				return nil
+			}
+			fmt.Println("writing bar", bar)
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 }

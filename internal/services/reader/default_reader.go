@@ -1,6 +1,7 @@
 package reader
 
 import (
+	"context"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -22,7 +23,7 @@ func NewReader() *DefaultReader {
 	}
 }
 
-func (r *DefaultReader) Read(filePath string) error {
+func (r *DefaultReader) Read(filePath string, ctx context.Context, ticksChan chan<- models.Tick) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		fmt.Println("Cannot open file:", err)
@@ -58,8 +59,14 @@ func (r *DefaultReader) Read(filePath string) error {
 
 		tick := models.Tick{Timestamp: timestamp, Bid: bid, Ask: ask}
 		fmt.Printf("Tick %d: %v\n", lineNumber, tick)
+		select {
+		case ticksChan <- tick:
+			// noop
+		case <-ctx.Done():
+			return ctx.Err()
+		}
 
-		if lineNumber > 5 {
+		if lineNumber > 5 { // TODO: remove
 			break
 		}
 		lineNumber++
