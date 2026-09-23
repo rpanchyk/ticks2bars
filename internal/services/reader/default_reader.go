@@ -75,9 +75,9 @@ func (r *DefaultReader) Read(ctx context.Context, ticksChan chan<- models.Tick) 
 			return ctx.Err()
 		}
 
-		if lineNumber >= 20000000 { // TODO: remove
-			break
-		}
+		// if lineNumber >= 20000000 { // debug only
+		// 	break
+		// }
 		lineNumber++
 	}
 	return nil
