@@ -7,6 +7,7 @@ timeframes = "1m,15m,1h" # timeframes (case-sensitive), --timeframes="1m,15m,1h"
 include_bars_header = false # include header in bar files, --include-bars-header=false
 ticks_timestamp_layout = "2006.01.02 15:04:05.000" # timestamp layout for tick files, --ticks-timestamp-layout="2006.01.02 15:04:05.000"
 bars_timestamp_layout = "2006-01-02 15:04:05" # timestamp layout for bar files, --bars-timestamp-layout="2006-01-02 15:04:05"
+decimals = 5 # number of decimal places (symbol digits), --decimals=5
 
 force = false # overwrite existing bars, --force=false
 write_batch_size = 1000 # batch size for writing data, --write-batch-size=1000

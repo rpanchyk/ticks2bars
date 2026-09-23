@@ -11,6 +11,7 @@ type Config struct {
 	IncludeBarsHeader    bool   `mapstructure:"include_bars_header"`
 	TicksTimestampLayout string `mapstructure:"ticks_timestamp_layout"`
 	BarsTimestampLayout  string `mapstructure:"bars_timestamp_layout"`
+	Decimals             int    `mapstructure:"decimals"`
 
 	Force          bool `mapstructure:"force"`
 	WriteBatchSize int  `mapstructure:"write_batch_size"`

@@ -19,6 +19,7 @@ var (
 	includeBarsHeader    bool
 	ticksTimestampLayout string
 	barsTimestampLayout  string
+	decimals             int
 	force                bool
 	writeBatchSize       int
 )
@@ -35,6 +36,7 @@ var convertCmd = &cobra.Command{
 		globals.Config.IncludeBarsHeader = utils.FirstNonFalseBool(includeBarsHeader, globals.Config.IncludeBarsHeader)
 		globals.Config.TicksTimestampLayout = utils.FirstNonEmptyString(ticksTimestampLayout, globals.Config.TicksTimestampLayout)
 		globals.Config.BarsTimestampLayout = utils.FirstNonEmptyString(barsTimestampLayout, globals.Config.BarsTimestampLayout)
+		globals.Config.Decimals = utils.FirstNonZeroInt(decimals, globals.Config.Decimals)
 		globals.Config.Force = utils.FirstNonFalseBool(force, globals.Config.Force)
 		globals.Config.WriteBatchSize = utils.FirstNonZeroInt(writeBatchSize, globals.Config.WriteBatchSize)
 		fmt.Printf("Adjusted config: %+v\n", globals.Config)
@@ -58,6 +60,7 @@ func init() {
 	convertCmd.Flags().BoolVar(&includeBarsHeader, "include-bars-header", false, "Include header in bars file")
 	convertCmd.Flags().StringVar(&ticksTimestampLayout, "ticks-timestamp-layout", "", "Ticks timestamp layout")
 	convertCmd.Flags().StringVar(&barsTimestampLayout, "bars-timestamp-layout", "", "Bars timestamp layout")
+	convertCmd.Flags().IntVar(&decimals, "decimals", 0, "Number of decimal places (symbol digits)")
 	convertCmd.Flags().BoolVar(&force, "force", false, "Overwrite existing bars")
 	convertCmd.Flags().IntVar(&writeBatchSize, "write-batch-size", 0, "Write batch size")
 

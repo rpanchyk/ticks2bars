@@ -121,10 +121,10 @@ func (w *DefaultWriter) writeBarsFile(symbol string, timeframe models.Timeframe,
 	content := ""
 	for _, bar := range bars {
 		content += bar.Timestamp.Format(w.config.BarsTimestampLayout)
-		content += "," + bar.Open.StringFixed(5)
-		content += "," + bar.High.StringFixed(5)
-		content += "," + bar.Low.StringFixed(5)
-		content += "," + bar.Close.StringFixed(5)
+		content += "," + bar.Open.StringFixed(int32(w.config.Decimals))
+		content += "," + bar.High.StringFixed(int32(w.config.Decimals))
+		content += "," + bar.Low.StringFixed(int32(w.config.Decimals))
+		content += "," + bar.Close.StringFixed(int32(w.config.Decimals))
 		content += "\n"
 	}
 
