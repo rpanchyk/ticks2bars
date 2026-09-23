@@ -14,15 +14,11 @@ import (
 
 type DefaultPipeline struct {
 	config *models.Config
-	reader reader.Reader
-	writer writer.Writer
 }
 
-func NewPipeline(reader reader.Reader, writer writer.Writer) *DefaultPipeline {
+func NewPipeline() *DefaultPipeline {
 	return &DefaultPipeline{
 		config: &globals.Config,
-		reader: reader,
-		writer: writer,
 	}
 }
 
@@ -32,6 +28,9 @@ func (p *DefaultPipeline) Run(convertable models.Convertable) error {
 	ticksChan := make(chan models.Tick, 1000)
 	barsChan := make(chan models.Bar, 1000)
 
+	reader := reader.NewReader(convertable.TicksFile)
+	writer := writer.NewWriter(convertable.Symbol, convertable.Timeframes)
+
 	// read
 	g, ctx := errgroup.WithContext(context.Background())
 	g.Go(func() error {
@@ -39,12 +38,17 @@ func (p *DefaultPipeline) Run(convertable models.Convertable) error {
 			close(ticksChan)
 			// fmt.Println("ticks channel closed")
 		}()
-		return p.reader.Read(convertable.TicksFile, ctx, ticksChan)
+		return reader.Read(ctx, ticksChan)
 	})
 
 	// write
+	writer.Init()
 	g.Go(func() error {
-		return p.writer.Write(ctx, barsChan)
+		defer func() {
+			writer.Flush()
+			// fmt.Println("writer flushed")
+		}()
+		return writer.Write(ctx, barsChan)
 	})
 
 	// process

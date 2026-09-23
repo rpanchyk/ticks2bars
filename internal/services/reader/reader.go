@@ -7,5 +7,5 @@ import (
 )
 
 type Reader interface {
-	Read(filePath string, ctx context.Context, ticksChan chan<- models.Tick) error
+	Read(ctx context.Context, ticksChan chan<- models.Tick) error
 }

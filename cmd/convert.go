@@ -7,8 +7,6 @@ import (
 	"github.com/rpanchyk/ticks2bars/internal/globals"
 	"github.com/rpanchyk/ticks2bars/internal/services/converter"
 	"github.com/rpanchyk/ticks2bars/internal/services/pipeline"
-	"github.com/rpanchyk/ticks2bars/internal/services/reader"
-	"github.com/rpanchyk/ticks2bars/internal/services/writer"
 	"github.com/rpanchyk/ticks2bars/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -41,9 +39,7 @@ var convertCmd = &cobra.Command{
 		globals.Config.WriteBatchSize = utils.FirstNonZeroInt(writeBatchSize, globals.Config.WriteBatchSize)
 		fmt.Printf("Adjusted config: %+v\n", globals.Config)
 
-		reader := reader.NewReader()
-		writer := writer.NewWriter()
-		pipeline := pipeline.NewPipeline(reader, writer)
+		pipeline := pipeline.NewPipeline()
 		converter := converter.NewConverter(pipeline)
 
 		err := converter.Convert()

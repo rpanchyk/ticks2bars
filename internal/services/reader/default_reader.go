@@ -14,17 +14,19 @@ import (
 )
 
 type DefaultReader struct {
-	config *models.Config
+	config   *models.Config
+	filePath string
 }
 
-func NewReader() *DefaultReader {
+func NewReader(filePath string) *DefaultReader {
 	return &DefaultReader{
-		config: &globals.Config,
+		config:   &globals.Config,
+		filePath: filePath,
 	}
 }
 
-func (r *DefaultReader) Read(filePath string, ctx context.Context, ticksChan chan<- models.Tick) error {
-	file, err := os.Open(filePath)
+func (r *DefaultReader) Read(ctx context.Context, ticksChan chan<- models.Tick) error {
+	file, err := os.Open(r.filePath)
 	if err != nil {
 		fmt.Println("Cannot open file:", err)
 		return err
