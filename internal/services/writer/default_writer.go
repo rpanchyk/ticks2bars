@@ -98,7 +98,7 @@ func (w *DefaultWriter) createBarsFile(symbol string, timeframe models.Timeframe
 
 	content := ""
 	if w.config.IncludeBarsHeader {
-		content += "timestamp,open,high,low,close\n"
+		content += "Timestamp,Open,High,Low,Close\n"
 	}
 
 	_, err = file.WriteString(content)
