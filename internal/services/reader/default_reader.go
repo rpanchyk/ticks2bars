@@ -16,12 +16,14 @@ import (
 type DefaultReader struct {
 	config   *models.Config
 	filePath string
+	isHeader bool
 }
 
 func NewReader(filePath string) *DefaultReader {
 	return &DefaultReader{
 		config:   &globals.Config,
 		filePath: filePath,
+		isHeader: true,
 	}
 }
 
@@ -47,6 +49,11 @@ func (r *DefaultReader) Read(ctx context.Context, ticksChan chan<- models.Tick) 
 
 		timestamp, err := time.Parse(r.config.TicksTimestampLayout, record[0])
 		if err != nil {
+			// skip header if present
+			if r.isHeader {
+				r.isHeader = false
+				continue
+			}
 			fmt.Printf("Error parsing timestamp: %v\n", err)
 			return err
 		}
