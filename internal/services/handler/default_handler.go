@@ -37,7 +37,8 @@ func (h *DefaultHandler) Handle(tick models.Tick) error {
 	}
 	// fmt.Println(h.bar.Timeframe, "barTime=", barTime)
 
-	midPrice := (tick.Bid.Add(tick.Ask)).Div(decimal.NewFromInt(2))
+	// price := (tick.Bid.Add(tick.Ask)).Div(decimal.NewFromInt(2))
+	price := tick.Bid
 
 	if isBarEmpty(h.bar) || isBarComplete(h.bar, barTime) {
 		err := h.Flush()
@@ -47,15 +48,15 @@ func (h *DefaultHandler) Handle(tick models.Tick) error {
 
 		// new bar
 		h.bar.Timestamp = barTime
-		h.bar.Open = midPrice
-		h.bar.High = midPrice
-		h.bar.Low = midPrice
-		h.bar.Close = midPrice
+		h.bar.Open = price
+		h.bar.High = price
+		h.bar.Low = price
+		h.bar.Close = price
 	} else {
 		// update bar
-		h.bar.High = decimal.Max(h.bar.High, midPrice)
-		h.bar.Low = decimal.Min(h.bar.Low, midPrice)
-		h.bar.Close = midPrice
+		h.bar.High = decimal.Max(h.bar.High, price)
+		h.bar.Low = decimal.Min(h.bar.Low, price)
+		h.bar.Close = price
 	}
 	return nil
 }
