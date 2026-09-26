@@ -55,6 +55,9 @@ ticks2bars convert --symbols="EURUSD" --timeframes="1h"
 
 Will convert ticks to bars for the `EURUSD` symbol and `1h` timeframe.
 
+Example output:
+![output](docs/output.png)
+
 ## How it works
 
 Having a `tick` file with the following content:
