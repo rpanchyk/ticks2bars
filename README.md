@@ -60,7 +60,7 @@ Will convert ticks to bars for the `EURUSD` symbol and `1h` timeframe.
 
 ## How it works
 
-Having a `tick` file with the following content:
+Having a `ticks`-file with the following content:
 
 ```csv
 Timestamp,Bid,Ask
@@ -80,7 +80,7 @@ Timestamp,Bid,Ask
 2020.06.22 00:02:57.916,1.11831,1.11870
 ```
 
-Will be converted to a `bar` file (for example, 1 minute bars) with the following content:
+Will be converted to a `bars`-file (for example, 1 minute bars) with the following content:
 
 ```csv
 Timestamp,Open,High,Low,Close
