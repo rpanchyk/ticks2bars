@@ -52,7 +52,7 @@ func (w *DefaultWriter) Write(ctx context.Context, barsChan <-chan models.Bar) e
 			if !ok {
 				return nil
 			}
-			// fmt.Println("writing bar", bar)
+			// fmt.Println("Writing bar", bar)
 
 			tf := bar.Timeframe
 			if _, exists := w.bars[tf]; !exists {

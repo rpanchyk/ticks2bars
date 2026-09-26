@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -9,8 +10,9 @@ import (
 )
 
 type DefaultHandler struct {
-	barsChan chan<- models.Bar
-	bar      models.Bar
+	ticksChan <-chan models.Tick
+	barsChan  chan<- models.Bar
+	bar       models.Bar
 }
 
 func NewHandler(symbol string, timeframe models.Timeframe, barsChan chan<- models.Bar) *DefaultHandler {
@@ -23,7 +25,22 @@ func NewHandler(symbol string, timeframe models.Timeframe, barsChan chan<- model
 	}
 }
 
-func (h *DefaultHandler) Handle(tick models.Tick) error {
+func (h *DefaultHandler) Handle(ctx context.Context, ticksChan <-chan models.Tick) error {
+	for {
+		select {
+		case tick, ok := <-ticksChan:
+			if !ok {
+				fmt.Println("Ticks channel closed for timeframe", h.bar.Timeframe)
+				return nil
+			}
+			h.handleTick(tick)
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+}
+
+func (h *DefaultHandler) handleTick(tick models.Tick) error {
 	// fmt.Println(h.bar.Timeframe, "time=", tick.Timestamp)
 	interval := time.Duration(h.bar.Timeframe.Minutes()) * time.Minute
 	barTime := tick.Timestamp.Truncate(interval)
@@ -63,7 +80,7 @@ func (h *DefaultHandler) Handle(tick models.Tick) error {
 
 func (h *DefaultHandler) Flush() error {
 	if !isBarEmpty(h.bar) {
-		fmt.Println("sending bar", h.bar)
+		fmt.Println("Sending bar", h.bar)
 		h.barsChan <- h.bar
 	}
 	return nil
